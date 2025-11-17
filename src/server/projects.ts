@@ -1,36 +1,31 @@
 "use server";
 
-import { config } from "@/src/config";
 import { redirect } from "next/navigation";
 import { createProjectSchema } from "../schemas";
-import { repoExists, cloneTemplate } from "@/src/lib/github";
+import * as github from "@/src/lib/github";
 
-function getRepoName(clientName: string) {
-  return `${config.PROJECT_PREFIX}-${clientName}`;
+export async function projectExists(projectName: string) {
+  return await github.projectExists(projectName);
 }
 
-export async function projectExists(clientName: string) {
-  const repoName = getRepoName(clientName);
-
-  return await repoExists(repoName);
+export async function listProjects() {
+  return await github.listProjects();
 }
 
 export async function createProjectAction(
   prevState: string[],
   formData: FormData
 ): Promise<string[]> {
-  const clientName = formData.get("clientName");
+  const projectName = formData.get("projectName");
 
-  const parsed = createProjectSchema.safeParse({ clientName });
+  const parsed = createProjectSchema.safeParse({ projectName });
 
   if (!parsed.success) {
     return [parsed.error.issues[0].message];
   }
 
-  const repoName = getRepoName(parsed.data.clientName);
-
   try {
-    await cloneTemplate(repoName);
+    await github.createProject(parsed.data.projectName);
   } catch (error) {
     if (error instanceof Error) {
       return [error.message];
@@ -39,5 +34,25 @@ export async function createProjectAction(
     return ["An unexpected error occurred"];
   }
 
-  redirect(`/projects/${parsed.data.clientName}`);
+  return redirect("/");
+}
+
+export async function deleteProjectAction(projectName: string) {
+  const parsed = createProjectSchema.safeParse({ projectName });
+
+  if (!parsed.success) {
+    return [parsed.error.issues[0].message];
+  }
+
+  try {
+    await github.deleteProject(parsed.data.projectName);
+  } catch (error) {
+    if (error instanceof Error) {
+      return [error.message];
+    }
+
+    return ["An unexpected error occurred"];
+  }
+
+  return redirect("/");
 }

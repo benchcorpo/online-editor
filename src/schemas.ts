@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createProjectSchema = z.object({
-  clientName: z
+  projectName: z
     .string()
     .min(1, "Client name is required")
     .regex(

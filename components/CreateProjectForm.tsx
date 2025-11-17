@@ -4,17 +4,17 @@ import { useState, useActionState } from "react";
 import { createProjectAction } from "@/src/server/projects";
 
 export function CreateProjectForm() {
-  const [clientName, setClientName] = useState("");
+  const [projectName, setProjectName] = useState("");
   const [error, action, pending] = useActionState(createProjectAction, []);
 
   return (
     <form action={action}>
       <input
         type="text"
-        id="clientName"
-        name="clientName"
-        value={clientName}
-        onChange={(e) => setClientName(e.target.value)}
+        id="projectName"
+        name="projectName"
+        value={projectName}
+        onChange={(e) => setProjectName(e.target.value)}
         placeholder="Client name (example: client-a)"
         disabled={pending}
         required
