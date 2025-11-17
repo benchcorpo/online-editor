@@ -13,7 +13,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className="container mx-auto py-8 max-w-4xl">{children}</div>
+      </body>
     </html>
   );
 }
